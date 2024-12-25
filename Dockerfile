@@ -12,7 +12,8 @@ RUN pip3 install -r requirements.txt
 
 COPY ./core /app
 
-#CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+# CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
 # docker build -t django .
 # docker run -p 8000:8000 django
 # 127.0.0.1:8000
+# for create app enter this code in terminal : docker-compose exec backend sh -c "python manage.py startapp account"
