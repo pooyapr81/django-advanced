@@ -1,5 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser, PermissionsMixin)
+from django.utils.translation import ugettext_lazy as _
+from django.db.models.fields.related import ForeignKey
+
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 
 class UserManager(BaseUserManager):
@@ -13,7 +18,7 @@ class UserManager(BaseUserManager):
         create and save a user with the given email and password and extra data
         """
         if not email:
-            raise ValueError(-("the email must be set"))
+            raise ValueError(_("the email must be set"))
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
@@ -29,9 +34,9 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_active', True)
 
         if extra_fields.get('is_staff') is not True:
-            raise ValueError(-('superuser must have is_staff=True.'))
+            raise ValueError(_('superuser must have is_staff=True.'))
         if extra_fields.get('is_superuser') is not True:
-            raise ValueError(-('superuser must have is_superuser=True.'))
+            raise ValueError(_('superuser must have is_superuser=True.'))
         return self.create_user(email, password, **extra_fields)
 
 
@@ -64,3 +69,14 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.email
+
+
+'''
+create signal to create profile when user created
+'''
+
+
+@receiver(post_save, sender=User)
+def save_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
